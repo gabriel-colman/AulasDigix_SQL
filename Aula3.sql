@@ -66,3 +66,17 @@ insert into Empregado values ('Jose', 'Rua 3', 789, '1990-01-01', 'M', 789, 3000
 update Departamento set CPFGer = 123 where NumDep = 1;
 update Departamento set CPFGer = 456 where NumDep = 2;
 update Departamento set CPFGer = 789 where NumDep = 3;
+
+insert into Projeto values ('Proj1', 1, 'Local1', 1);
+insert into Projeto values ('Proj2', 2, 'Local2', 2);
+insert into Projeto values ('Proj3', 3, 'Local3', 3);
+
+insert into Dependente values (1, 123, 'Dep1', 'M', 'Filho');
+insert into Dependente values (2, 456, 'Dep2', 'F', 'Filha');
+insert into Dependente values (3, 789, 'Dep3', 'M', 'Filho');
+
+insert into Trabalha_Em values (123, 1, 40);
+insert into Trabalha_Em values (456, 2, 40);
+insert into Trabalha_Em values (789, 3, 40);
+
+-- 
