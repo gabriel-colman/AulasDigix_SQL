@@ -52,3 +52,17 @@ create table Dependente (
     Parentesco varchar(50),
     foreign key (CPFE) references Empregado(CPF) -- FK para o empregado responsável pelo dependente
 );
+
+-- Inseriri os dados
+insert into Departamento values ('Dep1', 1, null, '1990-01-01'); 
+insert into Departamento values ('Dep2', 2, null, '1990-01-01');
+insert into Departamento values ('Dep3', 3, null, '1990-01-01');
+
+insert into Empregado values ('Joao', 'Rua 1', 123, '1990-01-01', 'M', 123, 1000, 1, null);
+insert into Empregado values ('Maria', 'Rua 2', 456, '1990-01-01', 'F', 456, 2000, 2, null);
+insert into Empregado values ('Jose', 'Rua 3', 789, '1990-01-01', 'M', 789, 3000, 3, null);
+
+-- Fazer o update para atualizar o CPFGer dos departamentos
+update Departamento set CPFGer = 123 where NumDep = 1;
+update Departamento set CPFGer = 456 where NumDep = 2;
+update Departamento set CPFGer = 789 where NumDep = 3;
