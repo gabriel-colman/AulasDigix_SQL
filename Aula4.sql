@@ -21,3 +21,4 @@ create table Carro (
     -- codigoBarrra varchar(200) Default uuid_gereate(), -- exemplo que vai ser gerado: 123e4567-e89b-12d3-a456-426614174000
     -- codigoBarrra  Default uuid_gereate(),
 );
+
