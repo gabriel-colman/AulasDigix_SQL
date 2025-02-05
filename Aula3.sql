@@ -79,4 +79,71 @@ insert into Trabalha_Em values (123, 1, 40);
 insert into Trabalha_Em values (456, 2, 40);
 insert into Trabalha_Em values (789, 3, 40);
 
--- 
+-- Consulta de tudo 
+select * from Trabalha_Em, Departamento, Dependente, Projeto, Empregado;
+
+-- Substrings, com posições especificas de caracteres
+select NomeProj from Projeto where NomeProj Like 'P____';
+
+-- Diferença de Aspas Simples e Duplas 
+-- As simples pegam Strings 
+-- As duplas são para identificar o nome da tabela, coluna, etc..
+select e.Nome from Empregado e where e.Nome like 'J%';
+select "nome" from Empregado where "nome" like 'J%';
+
+
+-- Operadores na propia coluna
+-- Já vou calcular o almento de 10% nos salarios dos funciionarios
+select e.Nome, e.Salario * 1.1 from Empregado e; 
+-- Colocar nome referencia na operacao usando o As
+select e.Nome, e.Salario * 1.1 as SalarioAtualizado from Empregado e; 
+
+-- O uso do Distinct é para evitar duplicações 
+-- Se ouver 2 linhas iguais ela retorna uma
+select Distinct e.Nome, e.CPF from Empregado e, Trabalha_Em t
+where e.CPF = t.CPF;
+
+-- Utilizar UNION que é união de 2 consultas
+-- 2.  Listar os números de projetos nos quais esteja envolvido o empregado ‘João da Silva’ 
+-- como empregado ou como gerente responsável pelo departamento que 
+-- controla o projeto.
+(select Distinct p.NumProj From
+Projeto p, Departamento d, Empregado e 
+where p.NumDep = d.NumDep and d.CPFGer = e.CPF and e.Nome = 'Joao') --que ele ta como Gerente
+UNION 
+(select p.NumProj from
+Projeto p, Empregado e, Trabalha_Em t
+where p.NumProj = t.NumProj and t.CPF = e.CPF and e.Nome = 'Joao'); -- Procura como apenas um empregado
+
+-- Uso do Intersect 
+-- Listando os nomes dos empregados que também são gerentes de departamento
+select e.Nome from Empregado e
+Intersect
+select e.Nome from Empregado e, Departamento d where d.CPFGer = e.CPF;
+
+--  Utilizar o is Null, para imprimir registros que tem nulo em certa coluna
+select e.Nome from Empregado e where e.CPFSup is null; -- que é nulo
+select e.Nome from Empregado e where e.CPFSup is not null; -- que não é nulo
+
+-- Funções que já estão nativas 
+-- Média dos salarios dos empregados
+select AVG(salario) from Empregado; 
+-- O maximo dos salarios dos empregados, ou que é o salario maximo que esta nos emprgados
+select MAX(salario) from Empregado; 
+select MIN(salario) from Empregado; 
+-- A soma total dos salarios dos empregados
+select SUM(salario) from Empregado; 
+
+--  Selecionar o CPF de todos os empregados que trabalham no mesmo 
+-- projeto e com a mesma quantidade de horas que o empregado cujo 
+--  CPF é 123.
+
+select Distinct CPF
+from Trabalha_Em
+where (NumProj, HorasSemana) in -- o in para verifcar se o resultado esta na subconsulta
+(select NumProj, HorasSemana from Trabalha_Em where cpf = 123);
+
+--  Selecionar o nome de todos os empregados que têm salário maior do que
+--  todos os salários dos empregados do departamento 2
+select nome from Empregado
+where salario > all (select salario from Empregado where NumDep = 2);
