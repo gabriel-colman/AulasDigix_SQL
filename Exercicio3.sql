@@ -208,3 +208,39 @@ and fs1.filme_idfilme = fs2.filme_idfilme
 and fs1.horario_idhorario <> fs2.horario_idhorario
 join filme f on fs1.filme_idfilme = f.idfilme
 join sala s on fs1.sala_idSala = s.idSala;
+
+-- 12. Exibir todas as funções diferentes que os funcionários exercem 
+-- e a quantidade de funcionários em cada uma.
+select funcao.nome as funcao, Count(f.idfuncionario) as total_funcionario
+from funcionario f
+join funcao on f.idfuncionario = funcao.idfuncao
+GROUP BY funcao.nome;
+ -- Group by é usado para agrupar linhas com base em uma ou mais colunas
+
+ -- 13. Encontrar os filmes que foram exibidos em salas com 
+--   capacidade superior à média de todas as salas
+select f.nomeBR, s.nome as sala, s.capacidade
+from filme_exibido_sala fs
+join sala s on fs.sala_idSala = s.idSala
+join filme f on fs.filme_idfilme = f.idfilme
+where s.capacidade > (select avg (capacidade) from sala);
+
+-- 15. Exibir a relação entre a capacidade da sala e o número 
+-- total de filmes exibidos nela
+select s.nome as sala, s.capacidade, count (fs.filme_idfilme) as total__filmes,
+(count(fs.filme_idfilme) / nullif(s.capacidade, 0)) as filems_por_assento
+from sala s
+LEFT join filme_exibido_sala fs on s.idSala = fs.sala_idSala
+Group by s.idSala, s.capacidade;
+
+SELECT S.nome, S.CAPACIDADE, COUNT(FES.filme_idfilme) AS QTD_FILMES,
+(COUNT(FES.filme_idfilme) / NULLIF(S.CAPACIDADE, 0)) AS RATIO
+FROM filme_exibido_sala FES
+RIGHT JOIN SALA S ON FES.sala_idSala = S.idSala
+GROUP BY S.nome, S.CAPACIDADE, S.idSala
+ORDER BY RATIO ASC;
+
+
+-- Altenrativa de DateDiff para Postgres é JUSTIFY_INTERVAL
+-- Exemplo de uso
+SELECT justify_interval('2021-01-01'::date - '2021-01-01'::date) as diferenca;
