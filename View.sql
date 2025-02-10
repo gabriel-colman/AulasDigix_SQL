@@ -100,6 +100,8 @@ INSERT INTO aluno (dataMatricula, nome, endereco, telefone, dataNascimento, altu
 ('2024-04-08', 'Juliana Costa', 'Rua D, 321', 11965432109, '1999-03-15', 1.70, 55),
 ('2024-05-12', 'Ricardo Mendes', 'Rua E, 654', 11954321098, '2001-01-25', 1.78, 75);
 
+INSERT INTO aluno (dataMatricula, nome, endereco, telefone, dataNascimento, altura, peso) VALUES
+('2024-01-15', 'Gabriel fas', 'Rua A, 123', 11998765433, '2000-06-24', 1.85, 80),
 
 INSERT INTO chamada (data, presente, aluno_codMatricula, turma_idturma) VALUES
 ('2024-06-01', TRUE, 1, 1),
@@ -111,32 +113,11 @@ INSERT INTO chamada (data, presente, aluno_codMatricula, turma_idturma) VALUES
 INSERT INTO chamada (data, presente, aluno_codMatricula, turma_idturma) VALUES
 ('2025-02-01', TRUE, 1, 1);
 
--- 3. Mostrar a média de idade dos alunos em cada turma
-select nome, round(avg(extract (year from age (current_date, dataNascimento))), 2) as idade
-from aluno group by nome;
-
--- outra forma
-select t.idturma as turma,
-    round(avg(extract (year from age (current_date, dataNascimento))), 2) as idade_media
-    from aluno a
-join chamada c on a.codMatricula = c.aluno_codMatricula
-join turma t on c.turma_idturma = t.idturma
-group by t.idturma
-order by idade_media desc;
-
--- color a & curl parrot.live
-
--- 6 ️. Encontrar alunos que frequentaram todas as aulas de sua turma
-select a.nome as aluno, t.idturma as turma
-from aluno a
-join chamada c on a.codMatricula = c.aluno_codMatricula
-join turma t on c.turma_idturma = t.idturma
-group by a.codMatricula, t.idturma
--- Having é clausula para filtrar os resultados de uma consulta, tipo  um if/else
-Having  count(case when c.presente = true then 1 end) =
-(select count(*) from chamada c2 where c2.turma_idturma = t.idturma);
 
 -- 8. Listar os alunos que estão matriculados em mais de uma turma 
+--  or raplace é quando cria uma nova viel ou subtitui a existente 
+-- create or replace view aluno_turma as 
+create view aluno_turma as 
 select a.nome as aluno, count(distinct t.idturma) as qtd_turmas
 from aluno a
 join chamada c on a.codMatricula = c.aluno_codMatricula
@@ -144,11 +125,38 @@ join turma t on c.turma_idturma = t.idturma
 group by a.codMatricula, a.nome
 Having count(distinct t.idturma) > 1;
 
--- 9 ️. Encontrar as turmas que possuem a maior quantidade de alunos 
-select t.idturma as turma, count(a.codMatricula) as qtd_alunos
+-- Chamar as View
+select * from aluno_turma;
+select aluno from aluno_turma; -- to chamando somente a coluna da view
+
+-- Excluir view
+drop view aluno_turma;
+
+-- Editar
+create or replace view aluno_turma as 
+select a.nome as aluno, count(distinct t.idturma) as qtd_turmas
 from aluno a
 join chamada c on a.codMatricula = c.aluno_codMatricula
 join turma t on c.turma_idturma = t.idturma
-group by t.idturma
-order by qtd_alunos desc limit 1;
+group by a.codMatricula, a.nome
+Having count(distinct t.idturma) > 2;
 
+
+-- View Materiazada é de fato a criação de uma tabela de acordo com a consulta
+    create MATERIALIZED view mv_total_presencas as
+    select nome, round(avg(extract (year from age (current_date, dataNascimento))), 2) as idade
+    from aluno group by nome;
+
+refresh MATERIALIZED view mv_total_presencas;
+
+-- Simular view materializada no MySql
+create table mv_total_presencas1 (
+    aluno VARCHAR(200),
+    idade numeric
+);
+
+-- Vou inserir os dados de acordo com uma consulta
+insert into mv_total_presencas1
+select nome, round(avg(extract (year from age (current_date, dataNascimento))), 2) as idade
+    from aluno group by nome;
+    
