@@ -190,13 +190,16 @@ select * from gols();
 -- 6. Função que trata Exceções
 create or replace function obter_nome_time_excecao(id_time_nome integer) returns varchar as $$
 declare
-	v_nome varchar(50);
+    v_nome varchar(50);
 begin
-	select nome into v_nome from time where id = id_time_nome;
-	return v_nome;
-	Exception 
-	when No_Data_Found then
-		raise notice 'Nenhum registro encontrado';
+    begin
+        select nome into v_nome from time where id = id_time_nome;
+    exception
+        when no_data_found then
+            raise notice 'Nenhum registro encontrado';
+            v_nome := 'Nenhum registro encontrado';
+    end;
+    return v_nome;
 end;
 $$ language plpgsql;
 
