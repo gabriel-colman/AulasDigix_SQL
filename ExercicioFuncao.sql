@@ -1,24 +1,29 @@
+-- 1. Criar a tabela Departamento primeiro (sem a FK para Empregado ainda)
+create table Departamento (
+    NomeDep varchar(50),
+    NumDep int primary key not null,
+    CPFGer varchar(11), -- Referência a Empregado será adicionada depois
+    DataInicioGer date
+);
+
+-- 2. Criar a tabela Empregado depois, garantindo que NumDep já existe
 create table Empregado (
     Nome varchar(50),
     Endereco varchar(500),
-    CPF int primary key not null,
+    CPF varchar(11) primary key not null,
     DataNasc date,
     Sexo char(10),
     CartTrab int,
     Salario float,
     NumDep int,
-    CPFSup int,
-    foreign key (NumDep) references Empregado(NumDep)
+    CPFSup varchar(11),
+    foreign key (NumDep) references Departamento(NumDep) -- Agora esta FK pode existir
 );
 
-create table Departamento (
-    NomeDep varchar(50),
-    NumDep int primary key not null,
-    CPFGer int,
-    DataInicioGer date,
-    foreign key (CPFGer) references Empregado(CPF)
-);
+-- 3. Agora que Empregado existe, adicionamos a FK de Departamento para Empregado
+ALTER TABLE Departamento ADD CONSTRAINT fk_cpger FOREIGN KEY (CPFGer) REFERENCES Empregado(CPF);
 
+-- 4. Criar a tabela Projeto, que depende de Departamento
 create table Projeto (
     NomeProj varchar(50),
     NumProj int primary key not null,
@@ -27,22 +32,26 @@ create table Projeto (
     foreign key (NumDep) references Departamento(NumDep)
 );
 
+-- 5. Criar a tabela Dependente, que depende de Empregado
 create table Dependente (
     idDependente int primary key not null,
-    CPFE int,
+    CPFE varchar(11),
     NomeDep varchar(50),
     Sexo char(10),
     Parentesco varchar(50),
-    foreign key (CPF) references Empregado(CPF)
+    foreign key (CPFE) references Empregado(CPF)
 );
 
+-- 6. Criar a tabela Trabalha_Em, que depende de Empregado e Projeto
 create table Trabalha_Em (
-    CPF int,
+    CPF varchar(11),
     NumProj int,
     HorasSemana int,
     foreign key (CPF) references Empregado(CPF),
     foreign key (NumProj) references Projeto(NumProj)
 );
+
+
 
 -- Inserir os dados
 
@@ -97,3 +106,8 @@ begin
     return salario;
 end;
 $$ language plpgsql;
+
+
+select * from Empregado;
+
+select SalarioEmpregado(456);
