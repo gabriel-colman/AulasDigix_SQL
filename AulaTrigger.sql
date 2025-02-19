@@ -160,3 +160,38 @@ update partida set time_1_gols = 2 where id = 11;
 select * from log_partida;
 
 -- fazer triguer que impessa de fazer update em partidas que ja foram finalizadas
+-- Postgres
+create or replace function validar_update_partida()
+returns trigger as $$
+begin 
+    if old.time_1_gols is not null then
+        raise exception 'Não é permitido alterar partidas finalizadas';
+    end if;
+    return new;
+end;
+$$ language plpgsql;
+
+create trigger validar_update_partida
+before update on partida
+for each row
+execute function validar_update_partida();
+
+-- Delete
+--  Postgres
+create or replace function delete_partida()
+returns trigger as $$
+begin
+    -- insert into log_partida(partida_id, acao) values ( old.id, 'DELETE');
+    -- return old;
+    -- impedir delete
+    raise exception 'Não é permitido deletar partidas';
+end;
+$$ language plpgsql;
+
+create or replace trigger delete_partida
+before delete on partida
+for each row
+execute function delete_partida();
+
+-- Testar
+delete from partida where id = 5;
